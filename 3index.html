@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Listing Page</title>
+</head>
+<body>
+
+    <div class="container">
+
+        
+        <aside class="sidebar">
+            <h2>Filters</h2>
+
+            <h3>Category</h3>
+            <label><input type="checkbox" class="category-filter" value="electronics"> Electronics</label>
+            <label><input type="checkbox" class="category-filter" value="fashion"> Fashion</label>
+            <label><input type="checkbox" class="category-filter" value="shoes"> Shoes</label>
+            <label><input type="checkbox" class="category-filter" value="home"> Home</label>
+
+            <h3>Price</h3>
+            <input type="range" min="100" max="5000" value="5000" id="priceRange">
+            <p>Max Price: ₹<span id="priceValue">5000</span></p>
+
+            <h3>Sort By Rating</h3>
+            <select id="sortSelect">
+                <option value="default">Default</option>
+                <option value="high">High to Low</option>
+                <option value="low">Low to High</option>
+            </select>
+        </aside>
+
+        
+        <main class="product-section">
+            <h1>Products</h1>
+            <div id="productContainer" class="product-container"></div>
+        </main>
+
+    </div>
+
+    <style>*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body{
+    background: #f4f4f4;
+}
+
+.container{
+    display: flex;
+    padding: 20px;
+}
+
+.sidebar{
+    width: 250px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.sidebar h2{
+    margin-bottom: 10px;
+}
+
+.sidebar label{
+    display: block;
+    margin: 5px 0;
+}
+
+.product-section{
+    flex: 1;
+    margin-left: 20px;
+}
+
+.product-container{
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.product-card{
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+    text-align: center;
+}
+
+.product-card img{
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+}
+
+.product-card h3{
+    margin: 10px 0;
+}
+
+.price{
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.rating{
+    background: gold;
+    padding: 3px 8px;
+    border-radius: 5px;
+}
+
+@media (max-width: 768px){
+    .container{
+        flex-direction: column;
+    }
+    .product-section{
+        margin-left: 0;
+    }
+}
+</style>
+
+    <script>
+const products = [
+    { id: 1, name: "Smartphone", category: "electronics", price: 12000, rating: 4.5, img: "https://via.placeholder.com/150" },
+    { id: 2, name: "Laptop", category: "electronics", price: 40000, rating: 4.8, img: "https://via.placeholder.com/150" },
+    { id: 3, name: "T-Shirt", category: "fashion", price: 500, rating: 4.2, img: "https://via.placeholder.com/150" },
+    { id: 4, name: "Running Shoes", category: "shoes", price: 1500, rating: 4.1, img: "https://via.placeholder.com/150" },
+    { id: 5, name: "Home Decor Lamp", category: "home", price: 900, rating: 3.9, img: "https://via.placeholder.com/150" },
+    { id: 6, name: "Jeans", category: "fashion", price: 1200, rating: 4.4, img: "https://via.placeholder.com/150" },
+    { id: 7, name: "Mixer Grinder", category: "home", price: 2400, rating: 4.6, img: "https://via.placeholder.com/150" }
+];
+
+// Render Products Function
+function renderProducts(list) {
+    const container = document.getElementById("productContainer");
+    container.innerHTML = "";
+
+    list.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+
+        card.innerHTML = `
+            <img src="${product.img}" alt="">
+            <h3>${product.name}</h3>
+            <p class="price">₹${product.price}</p>
+            <p class="rating">⭐ ${product.rating}</p>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+// FILTERING + SORTING FUNCTION
+function filterAndSort() {
+    let filtered = [...products];
+
+    // Category Filter
+    const selectedCategories = [...document.querySelectorAll(".category-filter:checked")]
+        .map(c => c.value);
+
+    if (selectedCategories.length) {
+        filtered = filtered.filter(p => selectedCategories.includes(p.category));
+    }
+
+    // Price Filter
+    const maxPrice = Number(document.getElementById("priceRange").value);
+    filtered = filtered.filter(p => p.price <= maxPrice);
+
+    // Sort by Rating
+    const sortType = document.getElementById("sortSelect").value;
+
+    if (sortType === "high") {
+        filtered.sort((a, b) => b.rating - a.rating);
+    }
+    if (sortType === "low") {
+        filtered.sort((a, b) => a.rating - b.rating);
+    }
+
+    renderProducts(filtered);
+}
+
+// Event Listeners
+document.querySelectorAll(".category-filter").forEach(c => c.addEventListener("change", filterAndSort));
+document.getElementById("priceRange").addEventListener("input", function () {
+    document.getElementById("priceValue").textContent = this.value;
+    filterAndSort();
+});
+document.getElementById("sortSelect").addEventListener("change", filterAndSort);
+
+// Initial Load
+renderProducts(products);
+</script>
+
+
+</body>
+</html>
